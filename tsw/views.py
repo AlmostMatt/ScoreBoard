@@ -84,9 +84,11 @@ def get_scores(request):
     page_size = int(request.GET.get("page_size", 16))
     mode = request.GET.get("mode", "New") # "Daily", "Weekly", "Monthly", "All Time"
     
-    # if the user is in the top 2x page_size or has not completed the level, return the top 2x page size
-    # otherwise, return the top page_size and the page_size group centered around the current user
-    # should probably half page size instead of doublign it (and subtract 1 for the ...)
+    # if the user is in the top page_size or has not completed the level, return the top page size
+    # otherwise, return the top page_size/2 and the page_size/2 group centered around the current user
+    # if the user is in the bottom page_size/4 users, the bottom page_size/4 is used instead of being centered on the user
+
+    # if the user is not in the top page_size, 1 fewer entry is returned since the client will indicate a ... between the areas
     
     start_time = None
     if mode == "Daily":
