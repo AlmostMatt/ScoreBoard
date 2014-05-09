@@ -1,7 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt  
 from django.shortcuts import render
 import json
-from tsw.models import User, HighScore
+from tsw.models import *
 from django.http import HttpResponse, Http404
 from django.utils import timezone
 
@@ -45,9 +45,6 @@ def save_score(request):
     level = int(request.POST.get("level"))
     score = int(request.POST.get("score"))
     replay = request.POST.get("replay", "")
-    
-    score = int(score)
-    user_id = int(user_id)
     try:
         u = User.objects.get(pk=user_id)
     except User.DoesNotExist:
@@ -69,7 +66,7 @@ def save_score(request):
 
 def get_scores(request):
     user_id = int(request.GET.get("user_id", 0))
-    level = int(request.GET.get("level"))
+    level = int(request.GET.get("level", 0))
     page_size = int(request.GET.get("page_size", 3))
     
     # if the user is in the top 2x page_size or has not completed the level, return the top 2x page size
@@ -103,39 +100,30 @@ def get_scores(request):
 @csrf_exempt   
 def save_level(request):
     user_id = int(request.POST.get("user_id"))
-    level = int(request.POST.get("level"))
-    score = int(request.POST.get("score"))
-    replay = request.POST.get("replay", "")
+    level_name = request.POST.get("level_name")
+    level_data = request.POST.get("level_data")
     
-    score = int(score)
-    user_id = int(user_id)
     try:
         u = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         raise Http404
-    highscore, created = HighScore.objects.get_or_create(user_id=user_id, level=level, defaults={'score_date' : timezone.now()})
-    if created or score < highscore.score:
-        highscore.score = score
-        highscore.score_date = timezone.now()
-        highscore.replay = replay
-        highscore.save()
+    level = CustomLevel.objects.create(creator_id=user_id, level_name=level_name, level_data=level_data, create_date=timezone.now())
     response_data = {
-        'user_id' : highscore.user_id,
-        'level' : highscore.level,
-        'score' : highscore.score,
-        'score_date' : str(highscore.score_date),
-        'replay' : replay
+        'creator' : level.creator.name,
+        'level_id' : level.id,
+        'level_name' : level.level_name,
+        'level_data' : level.level_data
     }
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 def get_levels(request):
     user_id = int(request.GET.get("user_id", 0))
     offset = int(request.GET.get("offset", 0))
-    mode = int(request.GET.get("mode", "New")) # "Popular", "New", "Top Rated"
+    mode = request.GET.get("mode", "New") # "Popular", "New", "Top Rated"
     page_size = int(request.GET.get("page_size", 8))
     
     levels = CustomLevel.objects.all()[offset:offset+page_size]
-    levels = [{'level_name' : level.level_name, 'level_id' : level.id, 'creator' : level.creator_id, 'creator_name' : level.creator.name, 'level_data' : level.level_data} for level in levels]
+    levels = [{'level_name' : level.level_name, 'level_id' : level.id, 'creator' : level.creator_id, 'creator_name' : level.creator.name, 'level_data' : level.level_data, 'rating' : level.avg_rating} for level in levels]
     response_data = {
         'levels' : levels,
         'num_levels' : len(levels)

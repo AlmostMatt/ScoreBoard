@@ -31,3 +31,4 @@ class CustomLevel(models.Model):
     completions = models.IntegerField(default=0)
     ratings = models.IntegerField(default=0)
     total_rating = models.IntegerField(default=0) # total_rating / #ratings = avg rating
+    avg_rating = models.FloatField(default=0)
