@@ -1,0 +1,63 @@
+TSW Client notes:
+
+pending requests for a given scene (high score screen, for example)
+invalidate pending -> set callback to null for each pending request
+
+have the client validate top N replays -> if they are all legit, then it is ok for 11+ to be cheaters
+some obfuscation : md5 checksum of params + user specific secret key (random number generated when the user is created) 
+
+
+CANNOT CURRENTLY TYPE Q in the user's name ALSO ENTER WOULD BE NICE
+rename
+score -> replay association (at least, for the top scores)
+ 
+reattempt new_user if it failed earlier, don't make other attempts unless a user can be created
+(or make other attempts as "anonymous")
+
+METRICS Log.
+
+
+
+
+
+
+REPLAY DATA IS TOO LARGE (an efficient solution to a 2 unit level is 1kb)
+a million users playing 10 levels -> 10gb (is this a lot? it seems like a lot)
+
+-- save replays for top 10,000 and have video camera icons in leaderboards 
+
+
+THERE IS A SMALL CLIENT DIFFERENCE in the SHARED DATA REPLAY AND THE compress decompress VERSION (he collided with a wall slightly differently as a ninja)
+
+
+CLIENT IDEA : precompute list of tiles that are partially visible to a given tower
+    (mark tiles as totally visible or partialyl visible)
+    then for each unit, for each tile it is partially on, mark the unit as potnetially visible to any towers that can see the tile
+    and then raycast to double check if the tile is only partially visible
+    
+    maybe even only check the tile that the player's center is above
+    
+I broke replay saving/loading :(
+
+Also, the first time a highscore is updated, i have to restart client to see it in the leaderboards, presumably due to caching
+
+
+
+
+Daily/Weekly ....
+
+EDIT option, "MY LEVELS" option
+    delete option ?
+works until browser session is cleared, then the user no longer knows their own identity
+
+
+Prevent multiple ratings from the same user for custom levels?
+    also count plays and replays on a unique user basis
+    
+    popular = #plays is a bad metric, since it will just show the oldest. maybe total_rating is useful. or avg_rating ^ 2 * num_ratings
+    # plays / time since creation is probably pretty good
+    and have it exclude levels created within the last 24 hours (this will probably favour levels that had a lot of plays right after they were created)
+    #plays / ceil(days) might be decent
+    
+    
+CLIENT : use secret and SERVER : validate / assert secret is correct
