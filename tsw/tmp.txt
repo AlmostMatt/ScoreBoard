@@ -61,3 +61,19 @@ Prevent multiple ratings from the same user for custom levels?
     
     
 CLIENT : use secret and SERVER : validate / assert secret is correct
+
+
+
+SERVER : delete replays that are > 1 week old and > top 1000/10000
+
+
+
+verified/verified_count and unknown / failed / failure_count in highscore objects
+
+
+
+cannot verify own, cannot rate own (initial rating on create) cannot increment play counter of own
+Annotate -> popularity
+
+
+user_id + user_secret for all post requests (and possibly get requests too)

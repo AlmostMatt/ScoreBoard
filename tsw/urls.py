@@ -12,4 +12,7 @@ urlpatterns = patterns('',
 
     url(r'^save_level/$', views.save_level),
     url(r'^get_levels/$', views.get_levels),
+    url(r'^rate_level/$', views.rate_level),
+    url(r'^played_level/$', views.played_level),
+    url(r'^completed_level/$', views.completed_level),
 )
