@@ -154,7 +154,7 @@ def save_level(request):
 
 def get_level(request):
     user_id = int(request.GET.get("user_id", 0))
-    level = int(request.POST.get("level"))
+    level = int(request.GET.get("level"))
     
     lvl = None
     try:
@@ -167,7 +167,8 @@ def get_level(request):
         'level_id' : lvl.id,
         'creator' : lvl.creator_id,
         'creator_name' : lvl.creator.name,
-        'level_data' : lvl
+        'level_data' : lvl.level_data,
+        'rating' : lvl.avg_rating
     }
     # do not return replays if the current user has not completed the level
     return HttpResponse(json.dumps(response_data), content_type="application/json")
