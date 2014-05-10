@@ -163,11 +163,11 @@ def get_level(request):
         raise Http404
     
     response_data = {
-        'level_name' : level.level_name,
-        'level_id' : level.id,
-        'creator' : level.creator_id,
-        'creator_name' : level.creator.name,
-        'level_data' : level
+        'level_name' : lvl.level_name,
+        'level_id' : lvl.id,
+        'creator' : lvl.creator_id,
+        'creator_name' : lvl.creator.name,
+        'level_data' : lvl
     }
     # do not return replays if the current user has not completed the level
     return HttpResponse(json.dumps(response_data), content_type="application/json")
