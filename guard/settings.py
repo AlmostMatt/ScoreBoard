@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tsw',
-    "flashpolicies",
+#    "flashpolicies",
 )
 
 MIDDLEWARE_CLASSES = (
