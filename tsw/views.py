@@ -177,9 +177,10 @@ def get_levels(request):
     user_id = int(request.GET.get("user_id", 0))
     offset = int(request.GET.get("offset", 0))
     mode = request.GET.get("mode", "New") # "Popular", "New", "Top Rated"
-    page_size = int(request.GET.get("page_size", 8))
+    page_size = int(request.GET.get("page_size", 6))
     
     levels = []
+    numlevels = CustomLevel.objects.all().count()
     if mode == "Popular":
         levels = CustomLevel.objects.all()
     elif mode == "New":
@@ -191,7 +192,7 @@ def get_levels(request):
     levels = [{'level_name' : level.level_name, 'level_id' : level.id, 'creator' : level.creator_id, 'creator_name' : level.creator.name, 'level_data' : level.level_data, 'rating' : level.avg_rating} for level in levels]
     response_data = {
         'levels' : levels,
-        'num_levels' : len(levels)
+        'num_levels' : numlevels
     }
     # do not return replays if the current user has not completed the level
     return HttpResponse(json.dumps(response_data), content_type="application/json")
