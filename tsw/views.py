@@ -156,13 +156,6 @@ def get_level(request):
     user_id = int(request.GET.get("user_id", 0))
     level = int(request.POST.get("level"))
     
-    try:
-        u = User.objects.get(pk=user_id)
-        if u.secret_code != secret_code:
-            raise PermissionDenied()
-    except User.DoesNotExist:
-        raise PermissionDenied()
-
     lvl = None
     try:
         lvl = CustomLevel.objects.get(pk=level)
