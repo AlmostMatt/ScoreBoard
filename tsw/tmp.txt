@@ -81,3 +81,22 @@ ENABLE CROSS DOMAIN ACCESS (middleware, xml, flashpolicy, ...)
 NEED CLIENT UI FOR HIGHSCORE PREVIEWING (camera icon, highlight selected replay, ...)
 
 STORE HASHED SECRET instead of just the secret
+
+
+
+NEED TO LOGIN BEFORE GOING TO LVL EDITOR OR CUSTOM LEVELS TOO
+
+FINALIZE LEVEL LIST
+    and update tiers SABCD / maxtime
+    
+    
+OPTIMIZE SHOT COLLISION AND TOWER TARGETING
+    maybe optimize dropshadows / add a shadow to a png image
+    
+    LEADERBOARD PAGES (offset)
+        show page containing self, and have button for prev page, 1st page, next page
+        and if on 1st page, have button next page, self page
+        
+    Level names
+    
+delete playtomic etc

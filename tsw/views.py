@@ -152,6 +152,33 @@ def save_level(request):
     }
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+def get_level(request):
+    user_id = int(request.GET.get("user_id", 0))
+    level = int(request.POST.get("level"))
+    
+    try:
+        u = User.objects.get(pk=user_id)
+        if u.secret_code != secret_code:
+            raise PermissionDenied()
+    except User.DoesNotExist:
+        raise PermissionDenied()
+
+    lvl = None
+    try:
+        lvl = CustomLevel.objects.get(pk=level)
+    except CustomLevel.DoesNotExist:
+        raise Http404
+    
+    response_data = {
+        'level_name' : level.level_name,
+        'level_id' : level.id,
+        'creator' : level.creator_id,
+        'creator_name' : level.creator.name,
+        'level_data' : level
+    }
+    # do not return replays if the current user has not completed the level
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    
 def get_levels(request):
     user_id = int(request.GET.get("user_id", 0))
     offset = int(request.GET.get("offset", 0))
