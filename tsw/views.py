@@ -92,7 +92,7 @@ def get_scores(request):
     
     start_time = None
     if mode == "Daily":
-        start_time = timezone.now() - timedelta(days=1)
+        start_time = timezone.now() - timedelta(hours=24)
     elif mode == "Weekly":
         start_time = timezone.now() - timedelta(days=7)
     elif mode == "Monthly":

@@ -7,9 +7,7 @@ have the client validate top N replays -> if they are all legit, then it is ok f
 some obfuscation : md5 checksum of params + user specific secret key (random number generated when the user is created) 
 
 
-CANNOT CURRENTLY TYPE Q in the user's name ALSO ENTER WOULD BE NICE
 rename
-score -> replay association (at least, for the top scores)
  
 reattempt new_user if it failed earlier, don't make other attempts unless a user can be created
 (or make other attempts as "anonymous")
@@ -27,8 +25,6 @@ a million users playing 10 levels -> 10gb (is this a lot? it seems like a lot)
 -- save replays for top 10,000 and have video camera icons in leaderboards 
 
 
-THERE IS A SMALL CLIENT DIFFERENCE in the SHARED DATA REPLAY AND THE compress decompress VERSION (he collided with a wall slightly differently as a ninja)
-
 
 CLIENT IDEA : precompute list of tiles that are partially visible to a given tower
     (mark tiles as totally visible or partialyl visible)
@@ -36,15 +32,8 @@ CLIENT IDEA : precompute list of tiles that are partially visible to a given tow
     and then raycast to double check if the tile is only partially visible
     
     maybe even only check the tile that the player's center is above
-    
-I broke replay saving/loading :(
-
-Also, the first time a highscore is updated, i have to restart client to see it in the leaderboards, presumably due to caching
 
 
-
-
-Daily/Weekly ....
 
 EDIT option, "MY LEVELS" option
     delete option ?
@@ -77,3 +66,18 @@ Annotate -> popularity
 
 
 user_id + user_secret for all post requests (and possibly get requests too)
+
+
+DELETE POLLS
+
+
+
+CLIENT : RECORDED POSITIONS AND IMPLICIT VELOCITY IS CURRENTLY DISABLED
+
+
+ENABLE CROSS DOMAIN ACCESS (middleware, xml, flashpolicy, ...)
+
+
+NEED CLIENT UI FOR HIGHSCORE PREVIEWING (camera icon, highlight selected replay, ...)
+
+STORE HASHED SECRET instead of just the secret
