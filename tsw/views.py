@@ -113,12 +113,12 @@ def get_scores(request):
     top_scores = scores[:page_size]
     other_scores = []
     if rank is not None and rank > page_size:
-        top_scores = scores[:math.floor((page_size-1)/2)]
-        num_other_scores = math.ceil((page_size-1)/2)
-        if rank > len(scores) - math.floor(num_other_scores/2):
+        top_scores = scores[:(page_size-1)/2]
+        num_other_scores = page_size/2
+        if rank > len(scores) - (num_other_scores/2):
             other_scores = scores[-num_other_scores:]
         else:
-            other_scores = scores[rank-math.ceil(num_other_scores/2): rank+math.floor(num_other_scores/2)]
+            other_scores = scores[rank-(num_other_scores+1)/2: rank+num_other_scores/2]
     response_data = {
         'top_scores' : top_scores,
         'other_scores' : other_scores,
