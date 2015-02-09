@@ -7,7 +7,7 @@ class User(models.Model):
     secret_code = models.IntegerField(default=0)
     create_date = models.DateTimeField('date registered')
     def __str__(self):
-        return self.name
+        return '%s (%s)' % (self.id, self.name)
     
 class HighScore(models.Model):
     user = models.ForeignKey(User)

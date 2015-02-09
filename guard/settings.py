@@ -20,11 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'mue-9#=zdsite0*)wbe@7u8637y^m3r7^*(d9kdg!-kj8q4ftq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True 
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.almostmatt.com']
 
 
 # Application definition
@@ -82,4 +82,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
+STATIC_URL = '/dj_static/'
+
+# any files in the following dirs will be copites to the static root
+#STATICFILES_DIRS = (
+#    os.path.join(BASE_DIR, 'static'),
+#    '/var/www/static/',
+#)
+
