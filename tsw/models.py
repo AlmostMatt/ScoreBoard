@@ -32,3 +32,6 @@ class CustomLevel(models.Model):
     ratings = models.IntegerField(default=0)
     total_rating = models.IntegerField(default=0) # total_rating / #ratings = avg rating
     avg_rating = models.FloatField(default=0)
+    
+    def __str__(self):
+        return '%s: %s by %s' % (self.id, self.level_name, self.creator.name)
