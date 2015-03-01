@@ -135,6 +135,7 @@ def save_level(request):
     user_id = int(request.POST.get("user_id"))
     level_name = request.POST.get("level_name")
     level_data = request.POST.get("level_data")
+    level_id = request.POST.get("level_id", None)
     secret_code = int(request.POST.get("secret_code"))
     
     try:
@@ -143,7 +144,23 @@ def save_level(request):
             raise PermissionDenied()
     except User.DoesNotExist:
         raise PermissionDenied()
-    level = CustomLevel.objects.create(creator_id=user_id, level_name=level_name, level_data=level_data, create_date=timezone.now(), ratings=1, avg_rating=10, total_rating=10, plays=1, completions=1)
+    
+    if level_id is None:
+        # create a new level
+        level = CustomLevel.objects.create(creator_id=user_id, level_name=level_name, level_data=level_data,
+            create_date=timezone.now(), ratings=1, avg_rating=10, total_rating=10, plays=1, completions=1)
+    else:
+        # update an existing level
+        try:
+            level = CustomLevel.objects.get(pk=level_id)
+        except CustomLevel.DoesNotExist:
+            raise Http404
+        if level.creator_id != user_id:
+            raise PermissionDenied()
+        level.level_name = level_name
+        level.level_data = level_data
+        level.save()
+
     response_data = {
         'creator' : level.creator.name,
         'level_id' : level.id,
@@ -180,16 +197,25 @@ def get_levels(request):
     page_size = int(request.GET.get("page_size", 6))
     
     levels = []
-    numlevels = CustomLevel.objects.all().count()
     if mode == "Popular":
-        levels = CustomLevel.objects.all()
+        levels = CustomLevel.objects.order_by('-plays')
     elif mode == "New":
         levels = CustomLevel.objects.order_by('-create_date')
     elif mode == "Top Rated":
         levels = CustomLevel.objects.order_by('-avg_rating')
-        
+    elif mode == "My Levels":
+        levels = CustomLevel.objects.filter(creator__id=user_id)
+    numlevels = levels.count()
+    
     levels = levels[offset:offset+page_size]
-    levels = [{'level_name' : level.level_name, 'level_id' : level.id, 'creator' : level.creator_id, 'creator_name' : level.creator.name, 'level_data' : level.level_data, 'rating' : level.avg_rating} for level in levels]
+    levels = [{
+                'level_name' : level.level_name,
+                'level_id' : level.id,
+                'creator_name' : level.creator.name,
+                'level_data' : level.level_data,
+                'rating' : level.avg_rating,
+                'plays' : level.plays
+              } for level in levels]
     response_data = {
         'levels' : levels,
         'num_levels' : numlevels
@@ -220,7 +246,7 @@ def rate_level(request):
     if lvl.creator_id != user_id:
         lvl.total_rating += rating
         lvl.ratings += 1
-        lvl.avg_rating = lvl.total_rating / lvl.ratings
+        lvl.avg_rating = lvl.total_rating / float(lvl.ratings)
         lvl.save()
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -244,9 +270,9 @@ def played_level(request):
     except CustomLevel.DoesNotExist:
         raise Http404
     # Don't count additional plays of your own level
-    if lvl.creator_id != user_id:
-        lvl.plays += 1
-        lvl.save()
+    # if lvl.creator_id != user_id:
+    lvl.plays += 1
+    lvl.save()
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
