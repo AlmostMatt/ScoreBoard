@@ -11,6 +11,14 @@ from datetime import timedelta
 from random import randint
 import math
 
+
+def server_info(request):
+    response_data = {
+        'base_url': 'http://www.almostmatt.com/dj/tsw',
+        'swf_url': 'http://www.almostmatt.com/dj/tswf.swf'
+    }
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
 @csrf_exempt   
 def new_user(request, name):
     u = User.objects.create(name=name, create_date=timezone.now(), secret_code=randint(0, 100000))

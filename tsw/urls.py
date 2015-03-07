@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     url(r'^save_score/$', views.save_score),
     #url(r'^get_scores/(?P<user_id>\d+)/(?P<level>\d+)/$', views.get_scores),
     url(r'^get_scores/$', views.get_scores),
-
+    url(r'^server_info/$', views.server_info),
     url(r'^save_level/$', views.save_level),
     url(r'^get_levels/$', views.get_levels),
     url(r'^get_level/$', views.get_level),
