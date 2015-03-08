@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tsw.models import User, HighScore, CustomLevel
+from tsw.models import User, HighScore, CustomLevel, MetricCount
 
 from django.contrib.admin.filters import AllValuesFieldListFilter
 
@@ -22,6 +22,10 @@ class CustomLevelAdmin(admin.ModelAdmin):
     list_filter = [('creator__id', DropDownFilter), 'create_date']
     search_fields = ['creator__name', 'level_name']
 
+class MetricCountAdmin(admin.ModelAdmin):
+    list_display = ['metric', 'n', 'count'] 
+
+admin.site.register(MetricCount, MetricCountAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(HighScore, HighScoreAdmin)
 admin.site.register(CustomLevel, CustomLevelAdmin)

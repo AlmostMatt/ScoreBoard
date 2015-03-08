@@ -1,22 +1,48 @@
 from django.views.decorators.csrf import csrf_exempt  
 from django.shortcuts import render
-import json
-from tsw.models import *
 from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
-
 from django.utils import timezone
-from datetime import timedelta
 
+from tsw.models import *
+
+from datetime import timedelta
 from random import randint
+import json
 import math
 
 
+def _increment_metric(metric, n=0):
+    metric_count, created = MetricCount.objects.get_or_create(metric=metric, n=m, defaults={count:1}) 
+    if not created:
+        metric_count.count += 1
+        metric_count.save()
+
 def server_info(request):
+    domain = request.GET.get('domain', 'UNKNOWN')
+    # count how many times people hit the shell
+    _increment_metric('server_info')
+    _increment_metric('domain: %s' % domain)
     response_data = {
         'base_url': 'http://www.almostmatt.com/dj/tsw',
         'swf_url': 'http://www.almostmatt.com/dj/tswf.swf'
     }
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def log_metric(request):
+    user_id = int(request.POST.get("user_id"))
+    metric = request.POST.get("metric")
+    n = int(request.POST.get("n", 0))
+    #secret_code = int(request.POST.get("secret_code"))
+    #try:
+    #    u = User.objects.get(pk=user_id)
+    #    if u.secret_code != secret_code:
+    #        raise PermissionDenied()
+    #except User.DoesNotExist:
+    #    raise PermissionDenied()
+    _increment_metric(metric, n)
+    response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @csrf_exempt   

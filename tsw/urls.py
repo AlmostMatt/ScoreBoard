@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^rate_level/$', views.rate_level),
     url(r'^played_level/$', views.played_level),
     url(r'^completed_level/$', views.completed_level),
+    url(r'^log_metric/$', views.log_metric),
 )

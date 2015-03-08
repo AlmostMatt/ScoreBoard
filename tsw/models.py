@@ -35,3 +35,10 @@ class CustomLevel(models.Model):
     
     def __str__(self):
         return '%s: %s by %s' % (self.id, self.level_name, self.creator.name)
+
+class MetricCount(models.Model):
+    metric = models.CharField(max_length=64)
+    n = models.IntegerField(default=0)
+    count = models.IntegerField(default=0)
+    def __str__(self):
+        return '%s (%s)' % (self.metric, self.n)
