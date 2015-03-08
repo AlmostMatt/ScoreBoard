@@ -11,27 +11,30 @@ class User(models.Model):
     
 class HighScore(models.Model):
     user = models.ForeignKey(User)
-    level = models.IntegerField(default=0)
+    level = models.IntegerField(db_index=True, default=0)
     score = models.IntegerField(default=0)
     score_date = models.DateTimeField('date score obtained')
     replay = models.TextField()
+
     class Meta:
         unique_together = (("user", "level"),)
+        index_together = (("user", "level"),)
         ordering = ['level', 'score', 'score_date'] # lower score + longer ago is better
     def __str__(self):
         return self.user.name + ", Level " + str(self.level) + ": " + str(self.score)
 
 class CustomLevel(models.Model):
-    creator = models.ForeignKey(User)
+    # index by author, plays, rating, and creation date for sort modes
+    creator = models.ForeignKey(User, db_index=True)
     level_data = models.TextField()
     level_name = models.CharField(max_length = 256)
-    create_date = models.DateTimeField('date registered')
+    create_date = models.DateTimeField('date registered', db_index=True)
     
-    plays = models.IntegerField(default=0)
+    plays = models.IntegerField(db_index=True, default=0)
     completions = models.IntegerField(default=0)
     ratings = models.IntegerField(default=0)
     total_rating = models.IntegerField(default=0) # total_rating / #ratings = avg rating
-    avg_rating = models.FloatField(default=0)
+    avg_rating = models.FloatField(db_index=True, default=0)
     
     def __str__(self):
         return '%s: %s by %s' % (self.id, self.level_name, self.creator.name)
@@ -40,5 +43,9 @@ class MetricCount(models.Model):
     metric = models.CharField(max_length=64)
     n = models.IntegerField(default=0)
     count = models.IntegerField(default=0)
+
+    class Meta:
+        index_together = (('metric', 'n'),)
     def __str__(self):
         return '%s (%s)' % (self.metric, self.n)
+

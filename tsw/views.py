@@ -13,7 +13,7 @@ import math
 
 
 def _increment_metric(metric, n=0):
-    metric_count, created = MetricCount.objects.get_or_create(metric=metric, n=m, defaults={count:1}) 
+    metric_count, created = MetricCount.objects.get_or_create(metric=metric, n=n, defaults={'count': 1}) 
     if not created:
         metric_count.count += 1
         metric_count.save()
