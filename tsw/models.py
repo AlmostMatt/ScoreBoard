@@ -6,8 +6,8 @@ class User(models.Model):
     name = models.CharField(max_length = 64)
     secret_code = models.IntegerField(default=0)
     create_date = models.DateTimeField('date registered')
-    def __str__(self):
-        return '%s (%s)' % (self.id, self.name)
+    def __unicode__(self):
+        return u'%s (%s)' % (self.id, self.name)
     
 class HighScore(models.Model):
     user = models.ForeignKey(User)
@@ -20,7 +20,7 @@ class HighScore(models.Model):
         unique_together = (("user", "level"),)
         index_together = (("user", "level"),)
         ordering = ['level', 'score', 'score_date'] # lower score + longer ago is better
-    def __str__(self):
+    def __unicode__(self):
         return self.user.name + ", Level " + str(self.level) + ": " + str(self.score)
 
 class CustomLevel(models.Model):
@@ -36,7 +36,7 @@ class CustomLevel(models.Model):
     total_rating = models.IntegerField(default=0) # total_rating / #ratings = avg rating
     avg_rating = models.FloatField(db_index=True, default=0)
     
-    def __str__(self):
+    def __unicode__(self):
         return '%s: %s by %s' % (self.id, self.level_name, self.creator.name)
 
 class MetricCount(models.Model):
