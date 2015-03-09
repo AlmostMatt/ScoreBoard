@@ -24,8 +24,9 @@ def server_info(request):
     _increment_metric('server_info')
     _increment_metric('domain: %s' % domain)
     response_data = {
-        'base_url': 'http://www.almostmatt.com/dj/tsw',
-        'swf_url': 'http://www.almostmatt.com/dj/tswf.swf'
+        # base url should not have http, swf url can
+        'base_url': 'www.almostmatt.com/dj/tsw',
+        'swf_url': 'http://www.almostmatt.com/tsw/tsw_v0.swf'
     }
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -46,8 +47,9 @@ def log_metric(request):
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
 @csrf_exempt   
-def new_user(request, name):
-    u = User.objects.create(name=name, create_date=timezone.now(), secret_code=randint(0, 100000))
+def new_user(request):
+    name = request.POST.get("name", "Anonymous")
+    u = User.objects.create(name=name, create_date=timezone.now(), secret_code=randint(0, 1000000000))
     response_data = {
         'user_id' : u.id,
         'secret_code' : u.secret_code,
@@ -197,6 +199,7 @@ def save_level(request):
 
     response_data = {
         'creator' : level.creator.name,
+        'share_url' : 'www.almostmatt.com/tsw/?level=%s' % level.id,
         'level_id' : level.id,
         'level_name' : level.level_name,
         'level_data' : level.level_data
