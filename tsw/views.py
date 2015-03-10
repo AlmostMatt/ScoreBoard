@@ -48,7 +48,8 @@ def log_metric(request):
 
 @csrf_exempt   
 def new_user(request):
-    name = request.POST.get("name", "Anonymous")
+    name = request.POST.get("name", "")
+    if name == "": name = "Anon%s" % randint(100, 999) # duplicates are OK
     u = User.objects.create(name=name, create_date=timezone.now(), secret_code=randint(0, 1000000000))
     response_data = {
         'user_id' : u.id,
