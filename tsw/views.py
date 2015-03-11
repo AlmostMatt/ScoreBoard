@@ -170,7 +170,7 @@ def get_scores(request):
             num_after_p = num_other_scores/2
             other_scores = zip(range(rank - num_before_p, rank + num_after_p + 1),
                                list(better_scores[rank - 1 - num_before_p:]) + [player_score] + list(worse_scores[:num_after_p]))
-    elif rank <= page_size:
+    elif rank is not None and rank <= page_size:
         top_scores = list(better_scores) + [player_score] + list(worse_scores[:page_size-rank])
         other_scores = []
     else:

@@ -18,7 +18,7 @@ class HighScore(models.Model):
 
     class Meta:
         unique_together = (("user", "level"),)
-        index_together = (("user", "level"),)
+        index_together = (("user", "level"), ("level", "score")) # fast lookup of a user's score and of ordered scores
         ordering = ['level', 'score', 'score_date'] # lower score + longer ago is better
     def __unicode__(self):
         return self.user.name + ", Level " + str(self.level) + ": " + str(self.score)
