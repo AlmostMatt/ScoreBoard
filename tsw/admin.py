@@ -14,7 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 class HighScoreAdmin(admin.ModelAdmin):
     fields = ['user', 'level', 'score', 'score_date']
     list_display = ('level', 'user', 'score', 'score_date')
-    list_filter = [('level', DropDownFilter), 'score_date', ('user__id', DropDownFilter)]
+    list_filter = [('level', DropDownFilter), 'score_date'] #, ('user__id', DropDownFilter)]
     search_fields = ['user__name']
 
 class CustomLevelAdmin(admin.ModelAdmin):
@@ -24,7 +24,9 @@ class CustomLevelAdmin(admin.ModelAdmin):
     search_fields = ['creator__name', 'level_name']
 
 class MetricCountAdmin(admin.ModelAdmin):
-    list_display = ['metric', 'n', 'count'] 
+    list_display = ['metric', 'n', 'count']
+    ordering = ('metric', 'n')
+
 
 admin.site.register(MetricCount, MetricCountAdmin)
 admin.site.register(User, UserAdmin)

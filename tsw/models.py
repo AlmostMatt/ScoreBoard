@@ -3,12 +3,12 @@ import datetime
 from django.utils import timezone
 
 class User(models.Model):
-    name = models.CharField(max_length = 64)
+    name = models.CharField(max_length = 256)
     secret_code = models.IntegerField(default=0)
     create_date = models.DateTimeField('date registered')
     def __unicode__(self):
         return u'%s (%s)' % (self.id, self.name)
-    
+
 class HighScore(models.Model):
     user = models.ForeignKey(User)
     level = models.IntegerField(db_index=True, default=0)
@@ -29,18 +29,18 @@ class CustomLevel(models.Model):
     level_data = models.TextField()
     level_name = models.CharField(max_length = 256)
     create_date = models.DateTimeField('date registered', db_index=True)
-    
+
     plays = models.IntegerField(db_index=True, default=0)
     completions = models.IntegerField(default=0)
     ratings = models.IntegerField(default=0)
     total_rating = models.IntegerField(default=0) # total_rating / #ratings = avg rating
     avg_rating = models.FloatField(db_index=True, default=0)
-    
+
     def __unicode__(self):
         return '%s: %s by %s' % (self.id, self.level_name, self.creator.name)
 
 class MetricCount(models.Model):
-    metric = models.CharField(max_length=64)
+    metric = models.CharField(max_length=256)
     n = models.IntegerField(default=0)
     count = models.IntegerField(default=0)
 
