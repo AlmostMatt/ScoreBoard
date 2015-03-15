@@ -391,7 +391,6 @@ def flag_replay(request):
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-
 def visualize_data(request):
     NUM_LEVELS = 56
     loads = 0
@@ -431,23 +430,22 @@ def visualize_data(request):
     #for pre in prefixes:
     #    response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
     #return HttpResponse(json.dumps(response_data), content_type="application/json")
+
     domain_data = PivotDataPool(
             series = [
               {'options': {
-                  'source': MetricCount.objects.filter(metric__startswith='domain: '),
+                  'source': MetricCount.objects.filter(metric__startswith='domain: ', count__gte=10),
                   'categories': ['metric'],
                   #'legend_by': 'n'
                   },
                'terms': {
-                   'Views': Sum('count')}}],
-            top_n=5,
-            top_n_term='Views')
+                   'Views': Sum('count')}}])
 
     domain_chart = PivotChart(
             datasource = domain_data,
             series_options = [
               {'options': {
-                  'type': 'column',
+                  'type': 'bar',
                   'stacking': True,
                   'xAxis': 0,
                   'yAxis': 0},
