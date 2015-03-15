@@ -46,6 +46,6 @@ class MetricCount(models.Model):
 
     class Meta:
         index_together = (('metric', 'n'),)
-    def __str__(self):
+    def __unicode__(self):
         return '%s (%s)' % (self.metric, self.n)
 

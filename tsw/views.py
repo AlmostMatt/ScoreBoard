@@ -1,11 +1,16 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
+from django.template import RequestContext
 
 from tsw.models import *
 
+from chartit import DataPool, Chart
+
+from collections import defaultdict
+import urllib2
 from datetime import timedelta
 from random import randint
 import json
@@ -381,4 +386,58 @@ def completed_level(request):
 def flag_replay(request):
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+def visualize_data(request):
+    NUM_LEVELS = 56
+    loads = 0
+    site_clicks = 0
+    num_users = User.objects.count()
+    num_scores = HighScore.objects.count()
+
+    domain_counts = defaultdict(int)
+    event_count = defaultdict(lambda: defaultdict(int))
+    prefixes = ['level_complete', 'level_skip', 'level_abandon', 'level_play', 'level_improve', 'time_up']
+    for m in MetricCount.objects.all():
+        metric = m.metric
+        if metric[:8] == "domain: ":
+            domain = urllib2.unquote(metric[8:]).split("/")[0]
+            domain_counts[domain] += m.count
+        if metric == "game_loaded":
+            loads += m.count
+        if metric == "click_site_link":
+            site_clicks += m.count
+        if metric in prefixes:
+            event_count[metric][m.n] += m.count
+    response_data = {
+            'domain_counts': domain_counts,
+            'loads': loads,
+            'site_click': site_clicks,
+            'num_users': num_users,
+            'num_scores': num_scores,
+    }
+    for pre in prefixes:
+        response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
+    #return HttpResponse(json.dumps(response_data), content_type="application/json")
+    data = DataPool(
+            series =
+                [{'options': {
+                    'source': MetricCount.objects.filter(metric='level_complete')},
+                  'terms': [
+                    'n',
+                    'count']
+                 }])
+    chart = Chart(
+            datasource = data,
+            series_options =
+            [{'options':{
+                'type': 'line',
+                'stacking': False},
+              'terms':{
+                  'n':['count']}
+              }],
+            chart_options =
+              {'title': {'text': 'Level Completions'},
+               'xAxis': {'title': {'text': 'Level number'}}})
+    return render_to_response('level_completion.html', {'completion': chart})
 

@@ -8,6 +8,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
+# get prod/debug specific settings from a config
+import config
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -17,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'mue-9#=zdsite0*)wbe@7u8637y^m3r7^*(d9kdg!-kj8q4ftq'
+SECRET_KEY = config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = config.DEBUG
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = config.TEMPLATE_DEBUG
 
 ALLOWED_HOSTS = ['.almostmatt.com']
 
@@ -37,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tsw',
+    'chartit'
 #    "flashpolicies",
 )
 
@@ -55,15 +59,15 @@ ROOT_URLCONF = 'guard.urls'
 WSGI_APPLICATION = 'guard.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+DATABASES = config.DATABASES
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+ADMINS = config.ADMINS
+EMAIL_HOST = config.EMAIL_HOST
+EMAIL_PORT = config.EMAIL_PORT
+EMAIL_HOST_USER = config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = config.EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = config.EMAIL_USE_TLS
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -82,12 +86,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-TEMPLATE_DIRES = [os.path.join(BASE_DIR, 'templates')]
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-STATIC_ROOT = 'static'
-STATIC_URL = '/dj_static/'
+STATIC_ROOT = 'static' # this is the file system path relative to the django project dir
+# files should not be placed directly in static_root, but colelctstatic can populate it
 
-# any files in the following dirs will be copites to the static root
+STATIC_URL = '/dj_static/' # this is the url prefix for static files
+
+# any files in the following dirs will be copied to the static root
+# when collectstatic is run
 #STATICFILES_DIRS = (
 #    os.path.join(BASE_DIR, 'static'),
 #    '/var/www/static/',
