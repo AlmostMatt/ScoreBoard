@@ -24,8 +24,8 @@ def _increment_metric(metric, n=0):
         metric_count.save()
 
 def server_info(request):
-    domain = request.GET.get('domain', 'UNKNOWN')
-    version = int(request.GET.get('version', 0))
+    domain = request.GET.get('domain', 'UNKNOWN').strip('/')
+    version = int(request.GET.get('version', '0').strip('/'))
     # count how many times people hit the shell
     _increment_metric('server_info', version)
     _increment_metric('domain: %s' % domain, version)
@@ -39,7 +39,7 @@ def server_info(request):
 @csrf_exempt
 def log_metric(request):
     #user_id = int(request.POST.get("user_id", 0))
-    metric = request.POST.get("metric")
+    metric = request.POST.get("metric", 'None')
     n = int(request.POST.get("n", 0))
     #secret_code = int(request.POST.get("secret_code"))
     #try:
@@ -99,11 +99,13 @@ def change_name(request, user_id, name):
 
 @csrf_exempt
 def save_score(request):
-    user_id = int(request.POST.get("user_id"))
+    user_id = int(request.POST.get("user_id", "-1"))
+    if (user_id == -1):
+        raise PermissionDenied()
     level = int(request.POST.get("level"))
     score = int(request.POST.get("score"))
     replay = request.POST.get("replay", "")
-    secret_code = int(request.POST.get("secret_code"))
+    secret_code = int(request.POST.get("secret_code").strip("/"))
 
     try:
         u = User.objects.get(pk=user_id)
@@ -132,7 +134,7 @@ def save_score(request):
 def get_scores(request):
     user_id = int(request.GET.get("user_id", 0))
     level = int(request.GET.get("level", 0))
-    page_size = int(request.GET.get("page_size", 16))
+    page_size = int(request.GET.get("page_size", "16").strip('/'))
     mode = request.GET.get("mode", "New") # "Daily", "Weekly", "Monthly", "All Time"
 
     # if the user is in the top page_size or has not completed the level, return the top page size
@@ -216,7 +218,7 @@ def save_level(request):
     level_name = request.POST.get("level_name")
     level_data = request.POST.get("level_data")
     level_id = request.POST.get("level_id", None)
-    secret_code = int(request.POST.get("secret_code"))
+    secret_code = int(request.POST.get("secret_code").strip('/'))
 
     try:
         u = User.objects.get(pk=user_id)
@@ -279,7 +281,7 @@ def get_levels(request):
 
     levels = []
     if mode == "Popular":
-        levels = CustomLevel.objects.order_by('-plays')
+        levels = CustomLevel.objects.filter(avg_rating__gte=6.0).order_by('-plays')
     elif mode == "New":
         levels = CustomLevel.objects.order_by('-create_date')
     elif mode == "Top Rated":
