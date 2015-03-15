@@ -399,47 +399,61 @@ def visualize_data(request):
 
     domain_counts = defaultdict(int)
     event_count = defaultdict(lambda: defaultdict(int))
-    prefixes = ['level_complete', 'level_skip', 'level_abandon', 'level_play', 'level_improve', 'time_up']
-    for m in MetricCount.objects.all():
-        metric = m.metric
-        if metric[:8] == "domain: ":
-            domain = urllib2.unquote(metric[8:]).split("/")[0]
-            domain_counts[domain] += m.count
-        if metric == "game_loaded":
-            loads += m.count
-        if metric == "click_site_link":
-            site_clicks += m.count
-        if metric in prefixes:
-            event_count[metric][m.n] += m.count
-    response_data = {
-            'domain_counts': domain_counts,
-            'loads': loads,
-            'site_click': site_clicks,
-            'num_users': num_users,
-            'num_scores': num_scores,
+    event_names = {
+            'level_complete': 'Complete',
+            'level_skip': 'Skip',
+            'level_abandon': 'Abandon',
+            'level_play': "Level Select (excludes 'Next Level')",
+            'level_improve': 'Improve Time',
+            'time_up': 'Time Limit Reached'
     }
-    for pre in prefixes:
-        response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
+    prefixes = event_names.keys()
+    #for m in MetricCount.objects.all():
+    #    metric = m.metric
+    #    if metric[:8] == "domain: ":
+    #        domain = urllib2.unquote(metric[8:]).split("/")[0]
+    #        domain_counts[domain] += m.count
+    #    if metric == "game_loaded":
+    #        loads += m.count
+    #    if metric == "click_site_link":
+    #        site_clicks += m.count
+    #    if metric in prefixes:
+    #        event_count[metric][m.n] += m.count
+    #response_data = {
+    #        'domain_counts': domain_counts,
+    #        'loads': loads,
+    #        'site_click': site_clicks,
+    #        'num_users': num_users,
+    #        'num_scores': num_scores,
+    #}
+    #for pre in prefixes:
+    #    response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
     #return HttpResponse(json.dumps(response_data), content_type="application/json")
     data = DataPool(
             series =
                 [{'options': {
-                    'source': MetricCount.objects.filter(metric='level_complete')},
+                    'source': MetricCount.objects.filter(metric=event),
+                    },
                   'terms': [
-                    'n',
-                    'count']
-                 }])
+                    {'%s_n' % event: 'n'},
+                    {event_names[event]: 'count'}]
+                 } for event in prefixes])
     chart = Chart(
             datasource = data,
             series_options =
             [{'options':{
                 'type': 'line',
                 'stacking': False},
-              'terms':{
-                  'n':['count']}
-              }],
+              'terms': {
+                  ('%s_n' % event): [event_names[event]]
+                }
+              } for event in prefixes],
             chart_options =
-              {'title': {'text': 'Level Completions'},
-               'xAxis': {'title': {'text': 'Level number'}}})
+              {'title': {'text': 'Level Statistics'},
+               'xAxis': {'title': {'text': 'Level number'},
+                        },
+               'yAxis': {'title': {'text': 'Number of Players'},
+                         'min': 0
+                   }})
     return render_to_response('level_completion.html', {'completion': chart})
 
