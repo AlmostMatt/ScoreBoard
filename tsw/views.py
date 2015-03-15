@@ -25,6 +25,7 @@ def _increment_metric(metric, n=0):
 
 def server_info(request):
     domain = request.GET.get('domain', 'UNKNOWN').strip('/')
+    domain = urllib2.unquote(domain) # %20 to space, etc
     version = int(request.GET.get('version', '0').strip('/'))
     # count how many times people hit the shell
     _increment_metric('server_info', version)
@@ -62,7 +63,7 @@ def new_user(request):
     if domain is not None:
         _increment_metric("new_user: %s" % domain)
 
-    u = User.objects.create(name=name, create_date=timezone.now(), secret_code=randint(0, 1000000000))
+    u = User.objects.create(name=name[:63], create_date=timezone.now(), secret_code=randint(0, 1000000000))
     response_data = {
         'user_id' : u.id,
         'secret_code' : u.secret_code,
@@ -229,7 +230,7 @@ def save_level(request):
 
     if level_id is None:
         # create a new level
-        level = CustomLevel.objects.create(creator_id=user_id, level_name=level_name, level_data=level_data,
+        level = CustomLevel.objects.create(creator_id=user_id, level_name=level_name[:63], level_data=level_data,
             create_date=timezone.now(), ratings=1, avg_rating=10, total_rating=10, plays=1, completions=1)
     else:
         # update an existing level
