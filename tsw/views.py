@@ -6,8 +6,9 @@ from django.utils import timezone
 from django.template import RequestContext
 
 from tsw.models import *
+from django.db.models import Sum
 
-from chartit import DataPool, Chart
+from chartit import DataPool, Chart, PivotDataPool, PivotChart
 
 from collections import defaultdict
 import urllib2
@@ -430,6 +431,34 @@ def visualize_data(request):
     #for pre in prefixes:
     #    response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
     #return HttpResponse(json.dumps(response_data), content_type="application/json")
+    domain_data = PivotDataPool(
+            series = [
+              {'options': {
+                  'source': MetricCount.objects.filter(metric__startswith='domain: '),
+                  'categories': ['metric'],
+                  #'legend_by': 'n'
+                  },
+               'terms': {
+                   'Views': Sum('count')}}],
+            top_n=5,
+            top_n_term='Views')
+
+    domain_chart = PivotChart(
+            datasource = domain_data,
+            series_options = [
+              {'options': {
+                  'type': 'column',
+                  'stacking': True,
+                  'xAxis': 0,
+                  'yAxis': 0},
+                'terms': ['Views']
+                }],
+            chart_options =
+              {'title': {'text': 'Domain distribution'},
+               'xAxis': {'title': {'text': 'Domains'},
+                        },
+               'yAxis': {'title': {'text': 'Number of Loads'}} })
+
     data = DataPool(
             series =
                 [{'options': {
@@ -439,6 +468,7 @@ def visualize_data(request):
                     {'%s_n' % event: 'n'},
                     {event_names[event]: 'count'}]
                  } for event in prefixes])
+
     chart = Chart(
             datasource = data,
             series_options =
@@ -456,5 +486,6 @@ def visualize_data(request):
                'yAxis': {'title': {'text': 'Number of Players'},
                          'min': 0
                    }})
-    return render_to_response('level_completion.html', {'completion': chart})
+
+    return render_to_response('level_completion.html', {'charts': [chart, domain_chart]})
 
