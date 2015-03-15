@@ -18,7 +18,7 @@ class HighScoreAdmin(admin.ModelAdmin):
     search_fields = ['user__name']
 
 class CustomLevelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'level_name', 'creator', 'create_date')
+    list_display = ('id', 'level_name', 'creator', 'create_date', 'plays', 'avg_rating')
     #fields = ['creator', 'level_name', 'create_date', 'plays', 'completions', 'ratings', 'total_rating', 'avg_rating']
     list_filter = [('creator__id', DropDownFilter), 'create_date']
     search_fields = ['creator__name', 'level_name']

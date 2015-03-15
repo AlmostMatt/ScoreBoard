@@ -278,7 +278,7 @@ def get_levels(request):
     elif mode == "New":
         levels = CustomLevel.objects.order_by('-create_date')
     elif mode == "Top Rated":
-        levels = CustomLevel.objects.order_by('-avg_rating')
+        levels = CustomLevel.objects.filter(ratings__gte=2).order_by('-avg_rating')
     elif mode == "My Levels":
         levels = CustomLevel.objects.filter(creator__id=user_id)
     numlevels = levels.count()
