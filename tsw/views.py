@@ -451,7 +451,7 @@ def visualize_data(request):
         # SQLite
         date_format = "date(create_date)"
     else:
-        date_format = "to_char(create_date, 'YY-MM-DD HH:00')"
+        date_format = "to_char(create_date, 'YYYY-MM-DD HHi24:00')"
 
     user_data = PivotDataPool(
             series = [
