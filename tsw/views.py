@@ -4,9 +4,11 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.template import RequestContext
+from django.contrib.admin.views.decorators import staff_member_required
 
+from guard.settings import DEBUG
 from tsw.models import *
-from django.db.models import Sum
+from django.db.models import Sum, Count
 
 from chartit import DataPool, Chart, PivotDataPool, PivotChart
 
@@ -391,6 +393,7 @@ def flag_replay(request):
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+@staff_member_required
 def visualize_data(request):
     NUM_LEVELS = 56
     loads = 0
@@ -430,6 +433,55 @@ def visualize_data(request):
     #for pre in prefixes:
     #    response_data[pre] = [event_count[pre][n] for n in range(NUM_LEVELS)]
     #return HttpResponse(json.dumps(response_data), content_type="application/json")
+    chart_style = {
+        'width': 1200,
+        'height': 600,
+        'borderWidth': 2,
+        'plotShadow': True,
+        #'plotBorderWidth': 2,
+        #'plotBorderColor': '#000000',
+        'backgroundColor': '#f3f3ff',
+        'plotBackgroundColor': '#fafafa',
+        'marginRight': 20,
+    }
+    chart_style_tall = dict(chart_style)
+    chart_style_tall['height'] = 900
+
+    if DEBUG:
+        # SQLite
+        date_format = "date(create_date)"
+    else:
+        date_format = "to_char(create_date, 'YY-MM-DD HH:00')"
+
+    user_data = PivotDataPool(
+            series = [
+              {'options': {
+                  # man, why does chartit make life so hard
+                  'source': User.objects.extra({'create_date': date_format}),
+                  'categories': ['create_date'],
+                  #'legend_by': 'n'
+                  },
+               'terms': {
+                   'Num Users': Count('id')}}])
+
+    user_chart = PivotChart(
+            datasource = user_data,
+            series_options = [
+              {'options': {
+                  'type': 'line',
+                  #'stacking': True,
+                  'xAxis': 0,
+                  'yAxis': 0},
+                'terms': ['Num Users']
+                }],
+            chart_options =
+              {'title': {'text': 'New Users by hour'},
+               'xAxis': {'title': {'text': 'Hour'},
+                        },
+               'yAxis': {'title': {'text': 'Number of New Users'},
+                         'min': 0},
+               'chart': chart_style})
+
 
     domain_data = PivotDataPool(
             series = [
@@ -455,7 +507,8 @@ def visualize_data(request):
               {'title': {'text': 'Domain distribution'},
                'xAxis': {'title': {'text': 'Domains'},
                         },
-               'yAxis': {'title': {'text': 'Number of Loads'}} })
+               'yAxis': {'title': {'text': 'Number of Loads'}},
+               'chart': chart_style_tall})
 
     data = DataPool(
             series =
@@ -482,8 +535,9 @@ def visualize_data(request):
                'xAxis': {'title': {'text': 'Level number'},
                         },
                'yAxis': {'title': {'text': 'Number of Players'},
-                         'min': 0
-                   }})
+                         'min': 0},
+               'chart': chart_style
+              })
 
-    return render_to_response('level_completion.html', {'charts': [chart, domain_chart]})
+    return render_to_response('level_completion.html', {'charts': [chart, domain_chart, user_chart]})
 

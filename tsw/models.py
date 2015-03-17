@@ -5,7 +5,7 @@ from django.utils import timezone
 class User(models.Model):
     name = models.CharField(max_length = 256)
     secret_code = models.IntegerField(default=0)
-    create_date = models.DateTimeField('date registered')
+    create_date = models.DateTimeField('date registered', db_index=True)
     def __unicode__(self):
         return u'%s (%s)' % (self.id, self.name)
 
