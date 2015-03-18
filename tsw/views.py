@@ -405,6 +405,34 @@ def flag_replay(request):
     response_data = {}
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+def get_domain_update(request):
+    user_id = int(request.GET.get("user_id", 0))
+    secret_code = int(request.GET.get("secret_code"))
+
+    referrer = request.META.get('HTTP_REFERER', None)
+
+    if referrer:
+        ref_split = referrer.split("//")
+        domain = ref_split[0] if len(ref_split) == 1 else ref_split[1]
+        domain = domain.split("/")[0]
+
+        _increment_metric("domain_updated: %s" % domain.strip("/"))
+
+        try:
+            u = User.objects.get(pk=user_id)
+            if u.secret_code != secret_code:
+                raise PermissionDenied()
+            # if it is already a good value, leave it as is
+            if (u.domain == "www.almostmatt.com" or u.domain == "" or u.domain == None):
+                u.domain = domain
+                u.save()
+        except User.DoesNotExist:
+            raise PermissionDenied()
+
+    response_data = {}
+    response = HttpResponse(json.dumps(response_data), content_type="application/json")
+    return response
+
 @staff_member_required
 def visualize_data(request):
     NUM_LEVELS = 56

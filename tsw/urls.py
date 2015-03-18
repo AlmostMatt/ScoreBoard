@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     url(r'^log_metric/$', views.log_metric),
     url(r'^flag_replay/$', views.flag_replay),
     url(r'^visualize_data/$', views.visualize_data),
+    url(r'^get_domain_update/$', views.get_domain_update),
 )
