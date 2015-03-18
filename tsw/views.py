@@ -60,18 +60,25 @@ def log_metric(request):
 def new_user(request):
     name = request.POST.get("name", "")
     domain = request.POST.get("domain", None)
+    referrer = request.META.get('HTTP_REFERER', None)
+
     if name == "":
         name = "Anon%s" % randint(100, 9999) # duplicates are OK
         _increment_metric("anonymous")
-    if domain is not None:
+    if referrer:
+        ref_split = referrer.split("//")
+        domain = ref_split[0] if len(ref_split) == 1 else ref_split[1]
+        domain = domain.split("/")[0]
+    if domain:
         _increment_metric("new_user: %s" % domain)
 
-    u = User.objects.create(name=name[:63], create_date=timezone.now(), secret_code=randint(0, 1000000000))
+    u = User.objects.create(name=name[:63], create_date=timezone.now(),
+                            secret_code=randint(0, 1000000000), domain=domain)
     response_data = {
         'user_id' : u.id,
         'secret_code' : u.secret_code,
         'name' : u.name,
-        'create_date' : str(u.create_date)
+        'create_date' : str(u.create_date),
     }
     response = HttpResponse(json.dumps(response_data), content_type="application/json")
     return response
@@ -176,6 +183,7 @@ def get_scores(request):
         rank = None
         num_scores = better_scores.count()
 
+    is_top_player = False
     if rank is not None and rank > page_size:
         # note that getting the last elements of a query set might be expensive. also query better, worse, player, anc ount better, worse ...
         top_scores = list(better_scores[:(page_size-1)/2])
@@ -191,6 +199,7 @@ def get_scores(request):
             other_scores = zip(range(rank - num_before_p, rank + num_after_p + 1),
                                list(better_scores[rank - 1 - num_before_p:]) + [player_score] + list(worse_scores[:num_after_p]))
     elif rank is not None and rank <= page_size:
+        is_top_player = True
         top_scores = list(better_scores) + [player_score] + list(worse_scores[:page_size-rank])
         other_scores = []
     else:
@@ -198,19 +207,19 @@ def get_scores(request):
         other_scores = []
 
     response_data = {
-        'top_scores' : scores_json(zip(range(1, len(top_scores) + 1), top_scores)),
-        'other_scores' : scores_json(other_scores),
+        'top_scores' : scores_json(zip(range(1, len(top_scores) + 1), top_scores), is_top_player),
+        'other_scores' : scores_json(other_scores, True),
         'num_scores' : num_scores
     }
     # do not return replays if the current user has not completed the level
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-def scores_json(scores_zipped):
+def scores_json(scores_zipped, replays=True):
     return [
         {'user_id' : score.user_id,
          'user_name' : score.user.name,
          'score' : score.score,
-         'replay' : score.replay,
+         'replay' : score.replay if replays else None,
          'rank' : rank
         } for rank, score in scores_zipped]
 

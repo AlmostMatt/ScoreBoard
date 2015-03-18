@@ -7,9 +7,8 @@ class DropDownFilter(AllValuesFieldListFilter):
     template = 'admin/dropdown_filter.html'
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'create_date')
+    list_display = ('id', 'name', 'domain', 'create_date')
     search_fields = ['name']
-    #list_filter = ['create_date']
 
 class HighScoreAdmin(admin.ModelAdmin):
     fields = ['user', 'level', 'score', 'score_date']

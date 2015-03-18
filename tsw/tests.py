@@ -20,7 +20,7 @@ class SanityTest(TestCase):
 
     def test_new_user(self):
         params = {'name': ''}
-        response = self.client.get(reverse('tsw.views.new_user'), params)
+        response = self.client.get(reverse('tsw.views.new_user'), params, HTTP_REFERER='http://test_new_user.com/asdf/')
         assert response.status_code == 200
         data = json.loads(response.content)
         assert data['name'][:4] == 'Anon'
