@@ -65,12 +65,15 @@ def new_user(request):
     if name == "":
         name = "Anon%s" % randint(100, 9999) # duplicates are OK
         _increment_metric("anonymous")
-    if referrer:
+
+    # with shell, shell sets domain and it is passed as an arg
+    # with inner, the request comes from where it is hosted
+    if referrer and (domain is None or domain.strip("/") == "<not set>"):
         ref_split = referrer.split("//")
         domain = ref_split[0] if len(ref_split) == 1 else ref_split[1]
         domain = domain.split("/")[0]
     if domain:
-        _increment_metric("new_user: %s" % domain)
+        _increment_metric("new_user: %s" % domain.strip("/"))
 
     u = User.objects.create(name=name[:63], create_date=timezone.now(),
                             secret_code=randint(0, 1000000000), domain=domain)
