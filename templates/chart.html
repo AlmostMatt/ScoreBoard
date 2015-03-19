@@ -1,0 +1,12 @@
+<head>
+<script src="/dj_static/js/jquery-1.11.2.min.js"></script>
+<script src="/dj_static/js/highcharts/highcharts.js"></script>
+ {% load chartit %}
+ {{ chart|load_charts:"container1" }}
+</head>
+<body>
+   <div id='container1'>Chart1 renders here</div>
+
+   <p>Charts generated with <a href="http://www.highcharts.com">HighCharts</a>, licensed under <a href="http://creativecommons.org/licenses/by/3.0">Creative Commons Attribution Non-Commercial 3.0</a>.
+   Django chart integration with <a href="http://chartit.shutupandship.com">Chartit</a>.</p>
+</body>
