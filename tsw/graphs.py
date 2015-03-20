@@ -9,8 +9,10 @@ from chartit import DataPool, Chart, PivotDataPool, PivotChart
 
 from collections import defaultdict
 import urllib2
-from datetime import timedelta
+from datetime import timedelta, datetime
 
+import logging
+logger = logging.getLogger(__name__)
 
 def _chart_style(w=1200, h=600):
     return {
@@ -74,7 +76,7 @@ def level_completion(request):
               })
     return render_to_response('chart.html', {'chart': chart})
 
-
+@staff_member_required
 def domain_distribution(request):
     domain_data = PivotDataPool(
             series = [
@@ -104,7 +106,22 @@ def domain_distribution(request):
                'chart': _chart_style(h=900)})
     return render_to_response('chart.html', {'chart': domain_chart})
 
+
+def hourly_users(request):
+    now = datetime.now()
+    result = []
+    t2 = now
+    for n in range(10):
+        t1 = t2 - timedelta
+        usrs = User.objects.filter(create_date__gte=t1, create_date__lt=t2).count()
+        result.append((n, usrs))
+        t2 = t1
+    return result
+
+
+@staff_member_required
 def new_users(request):
+    now = datetime.now()
     if DEBUG:
         # SQLite
         date_format = "date(create_date)"
@@ -139,4 +156,7 @@ def new_users(request):
                'yAxis': {'title': {'text': 'Number of New Users'},
                          'min': 0},
                'chart': _chart_style()})
+    duration = datetime.now() - now
+    logger.info("new_users took %s" % duration)
     return render_to_response('chart.html', {'chart': user_chart})
+
