@@ -8,6 +8,7 @@ urlpatterns = patterns('',
 #    url(r'^crossdomain.xml$',
 #    'flashpolicies.views.simple',
 #    {'domains': ['*']}),
+    url(r'^hearth/', include('TrackobotAnalysis.urls')),
     url(r'^tsw/', include('tsw.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )
