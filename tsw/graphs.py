@@ -33,7 +33,7 @@ def stats(request):
     num_scores = HighScore.objects.count()
 
 
-@staff_member_required
+#@staff_member_required
 def level_completion(request):
     #NUM_LEVELS = 56
     #    event_count = defaultdict(lambda: defaultdict(int))
@@ -76,12 +76,12 @@ def level_completion(request):
               })
     return render_to_response('chart.html', {'chart': chart})
 
-@staff_member_required
+#@staff_member_required
 def domain_distribution(request):
     domain_data = PivotDataPool(
             series = [
               {'options': {
-                  'source': MetricCount.objects.filter(metric__startswith='domain: ', count__gte=10),
+                  'source': MetricCount.objects.filter(metric__startswith='domain: ', count__gte=30),
                   'categories': ['metric'],
                   #'legend_by': 'n'
                   },
@@ -119,7 +119,7 @@ def hourly_users(request):
     return result
 
 
-@staff_member_required
+#@staff_member_required
 def new_users(request):
     now = datetime.now()
     if DEBUG:

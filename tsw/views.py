@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.template import RequestContext
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import F
 
 from tsw.models import *
 
@@ -17,7 +18,7 @@ import math
 def _increment_metric(metric, n=0):
     metric_count, created = MetricCount.objects.get_or_create(metric=metric, n=n, defaults={'count': 1})
     if not created:
-        metric_count.count += 1
+        metric_count.count = F('count') + 1
         metric_count.save()
 
 def server_info(request):
