@@ -83,57 +83,35 @@ def get_scores(request):
         player_score = HighScore.objects.get(level=level, user_id=user_id)
         if start_time is None:
             better_scores = HighScore.objects.filter(level=level, score__lt=player_score.score)
-            worse_scores = HighScore.objects.filter(level=level, score__gte=player_score.score)
         else:
             better_scores = HighScore.objects.filter(level=level, score__lt=player_score.score, score_date__gte=start_time)
-            worse_scores = HighScore.objects.filter(level=level, score__gte=player_score.score, score_date__gte=start_time)
         rank = better_scores.count() + 1
-        num_scores = rank + worse_scores.count() - 1 # currently the player's score is in worse scores
-        worse_scores = worse_scores.exclude(user_id=user_id)
 
     except HighScore.DoesNotExist:
         if start_time is None:
             better_scores = HighScore.objects.filter(level=level)
         else:
             better_scores = HighScore.objects.filter(level=level, score_date__gte=start_time)
-        worse_scores = []
         rank = None
         num_scores = better_scores.count()
-    '''
-    rank = None
-    start_time = None
-    better_scores = HighScore.objects.filter(level=level)
-    num_scores = page_size
-    #todo undo the above
-    '''
-    is_top_player = False
     if rank is not None and rank > page_size:
-        # note that getting the last elements of a query set might be expensive. also query better, worse, player, anc ount better, worse ...
         top_scores = list(better_scores[:(page_size-2)])
-        #num_other_scores = page_size/2
-        #if rank > num_scores - (num_other_scores/2):
-        #    # last page
-        #    other_scores = zip(range(num_scores + 1 - num_other_scores, num_scores + 1),
-        #                       list(better_scores[num_scores - num_other_scores:]) + [player_score] + list(worse_scores))
-        #else:
-        #    # some page in the middle
-        #    num_before_p = (num_other_scores+1)/2 - 1
-        #    num_after_p = num_other_scores/2
-        #    other_scores = zip(range(rank - num_before_p, rank + num_after_p + 1),
-        #                       list(better_scores[rank - 1 - num_before_p:]) + [player_score] + list(worse_scores[:num_after_p]))
         other_scores = [(rank, player_score)]
     elif rank is not None and rank <= page_size:
-        is_top_player = True
-        top_scores = list(better_scores) + [player_score] + list(worse_scores[:page_size-rank])
+        if start_time is None:
+            top_scores = HighScore.objects.filter(level=level)
+        else:
+            top_scores = HighScore.objects.filter(level=level, score_date__gte=start_time)
+        top_scores = list(top_scores[:page_size])
         other_scores = []
     else:
         top_scores = list(better_scores[:page_size])
         other_scores = []
 
     response_data = {
-        'top_scores' : scores_json(zip(range(1, len(top_scores) + 1), top_scores), True), # is_top_player
+        'top_scores' : scores_json(zip(range(1, len(top_scores) + 1), top_scores), True),
         'other_scores' : scores_json(other_scores, True),
-        'num_scores' : num_scores
+        'num_scores' : max(rank, page_size)  # I'm pretty sure this is unused, so it can be wrong 
     }
     # do not return replays if the current user has not completed the level
     return HttpResponse(json.dumps(response_data), content_type="application/json")

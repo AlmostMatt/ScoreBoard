@@ -1,3 +1,6 @@
 [submodule "TrackobotAnalysis"]
 	path = TrackobotAnalysis
 	url = https://github.com/AlmostMatt/TrackobotAnalysis.git
+[submodule "EternalDraft"]
+	path = EternalDraft
+	url = https://github.com/AlmostMatt/EternalDraft.git
