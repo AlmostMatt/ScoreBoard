@@ -31,6 +31,8 @@ ALLOWED_HOSTS = ['.almostmatt.com']
 
 # Application definition
 
+LOGIN_URL = 'login'
+
 INSTALLED_APPS = (
     'tsw',
     'EternalDraft',
