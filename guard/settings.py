@@ -29,19 +29,19 @@ TEMPLATE_DEBUG = config.TEMPLATE_DEBUG
 
 ALLOWED_HOSTS = ['.almostmatt.com']
 
-
 # Application definition
 
 INSTALLED_APPS = (
+    'tsw',
+    'EternalDraft',
+    'TrackobotAnalysis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'TrackobotAnalysis',
     'bootstrap3',
-    'tsw',
     'chartit',
 )
 
@@ -59,6 +59,7 @@ ROOT_URLCONF = 'guard.urls'
 
 WSGI_APPLICATION = 'guard.wsgi.application'
 
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 DATABASES = config.DATABASES
 
